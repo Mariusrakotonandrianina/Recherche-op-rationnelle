@@ -16,8 +16,8 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import dagre from "dagre";
 
-// Style amélioré pour les nœuds
-const nodeStyle = {
+// Style de base pour les nœuds (par défaut blanc)
+const defaultNodeStyle = {
   borderRadius: "50%",
   width: 60,
   height: 60,
@@ -29,6 +29,12 @@ const nodeStyle = {
   fontSize: "14px",
   color: "#000",
   border: "3px solid #555",
+  background: "#ffffff", // Fond blanc par défaut
+};
+
+// Style pour les nœuds avec arêtes entrantes ET sortantes (gris transparent)
+const connectedNodeStyle = {
+  ...defaultNodeStyle,
   background: "rgba(128, 128, 128, 0.5)", // Gris transparent
 };
 
@@ -50,13 +56,18 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
 
   return nodes.map((node) => {
     const nodeWithPosition = dagreGraph.node(node.id);
+    // Vérifier si le nœud a des arêtes entrantes ET sortantes
+    const hasOutgoing = edges.some((edge) => edge.source === node.id);
+    const hasIncoming = edges.some((edge) => edge.target === node.id);
+    const isFullyConnected = hasOutgoing && hasIncoming;
+
     return {
       ...node,
       position: {
         x: nodeWithPosition.x - 30,
         y: nodeWithPosition.y - 30,
       },
-      style: nodeStyle, // Appliquer le style amélioré aux nœuds
+      style: isFullyConnected ? connectedNodeStyle : defaultNodeStyle, // Gris si entrantes ET sortantes, sinon blanc
     };
   });
 };
@@ -70,11 +81,30 @@ interface GraphProps {
   onNodeSelect: (node: Node) => void;
 }
 
-export default function Graph({ nodes, edges, setNodes, setEdges, onEdgeSelect, onNodeSelect }: GraphProps) {
-  const onNodesChange = useCallback((changes: NodeChange[]) => setNodes(applyNodeChanges(changes, nodes)), [nodes, setNodes]);
-  const onEdgesChange = useCallback((changes: EdgeChange[]) => setEdges(applyEdgeChanges(changes, edges)), [edges, setEdges]);
-  const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => onEdgeSelect(edge), [onEdgeSelect]);
-  const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => onNodeSelect(node), [onNodeSelect]);
+export default function Graph({
+  nodes,
+  edges,
+  setNodes,
+  setEdges,
+  onEdgeSelect,
+  onNodeSelect,
+}: GraphProps) {
+  const onNodesChange = useCallback(
+    (changes: NodeChange[]) => setNodes(applyNodeChanges(changes, nodes)),
+    [nodes, setNodes]
+  );
+  const onEdgesChange = useCallback(
+    (changes: EdgeChange[]) => setEdges(applyEdgeChanges(changes, edges)),
+    [edges, setEdges]
+  );
+  const onEdgeClick = useCallback(
+    (event: React.MouseEvent, edge: Edge) => onEdgeSelect(edge),
+    [onEdgeSelect]
+  );
+  const onNodeClick = useCallback(
+    (event: React.MouseEvent, node: Node) => onNodeSelect(node),
+    [onNodeSelect]
+  );
 
   useEffect(() => {
     setNodes(getLayoutedElements(nodes, edges));
@@ -84,10 +114,11 @@ export default function Graph({ nodes, edges, setNodes, setEdges, onEdgeSelect, 
     <div className="flex-1 h-[600px] bg-white border-2 border-gray-300 rounded-lg shadow-lg p-4">
       <ReactFlow
         nodes={nodes}
-        edges={edges.map(edge => ({
+        edges={edges.map((edge) => ({
           ...edge,
           style: { strokeWidth: 2, stroke: "#222" }, // Noir foncé pour les arêtes
           markerEnd: { type: MarkerType.ArrowClosed, color: "#222" }, // Flèche noire foncée
+          labelStyle: { fontSize: "18px", fontWeight: "bold", fill: "#000" }, // Taille augmentée pour les poids
         }))}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
