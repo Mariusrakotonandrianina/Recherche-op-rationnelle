@@ -1,51 +1,52 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
-import ReactFlow, {
-  Background,
-  Controls,
-  MiniMap,
-  MarkerType,
-  applyNodeChanges,
-  applyEdgeChanges,
-  Edge,
-  Node,
-  NodeChange,
-  EdgeChange,
-} from "reactflow";
-import "reactflow/dist/style.css";
+import { useEffect, useRef, useCallback } from "react";
+import { Network } from "vis-network/standalone/esm/vis-network";
 import dagre from "dagre";
 
-// Style de base pour les nœuds (par défaut blanc)
+interface GraphProps {
+  nodes: { id: string; label?: string; x?: number; y?: number }[];
+  edges: { id?: string; source: string; target: string; label?: string }[];
+  setNodes: (nodes: { id: string; label?: string; x?: number; y?: number }[]) => void;
+  setEdges: (edges: { id?: string; source: string; target: string; label?: string }[]) => void;
+  onEdgeSelect: (edge: { id?: string; source: string; target: string; label?: string }) => void;
+  onNodeSelect: (node: { id: string; label?: string }) => void;
+  finalMatrix?: (number | string)[][];
+  solutionEdges?: { source: string; target: string }[];
+  changedCells?: Set<string>;
+  currentStep?: number;
+  showSolution?: boolean;
+}
+
 const defaultNodeStyle = {
-  borderRadius: "50%",
-  width: 60,
-  height: 60,
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  boxShadow: "5px 5px 15px rgba(0,0,0,0.3)",
-  fontWeight: "bold",
-  fontSize: "14px",
-  color: "#000",
-  border: "3px solid #555",
-  background: "#ffffff", // Fond blanc par défaut
+  shape: "circle",
+  size: 35,
+  borderWidth: 2,
+  borderWidthSelected: 4,
+  color: {
+    border: "#2E86C1",
+    background: "#DDEBF7",
+    highlight: { border: "#1B6B93", background: "#DDEBF7" },
+  },
+  font: { size: 16, color: "#1B1B1B", face: "Roboto", bold: true },
+  shadow: { enabled: true, size: 5, x: 2, y: 2, color: "rgba(0,0,0,0.1)" },
 };
 
-// Style pour les nœuds avec arêtes entrantes ET sortantes (gris transparent)
-const connectedNodeStyle = {
+const solutionNodeStyle = {
   ...defaultNodeStyle,
-  background: "rgba(128, 128, 128, 0.5)", // Gris transparent
+  color: { border: "#006400", background: "#90EE90" },
 };
 
-// Appliquer le layout avec dagre
-const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
+const getLayoutedElements = (
+  nodes: { id: string; label?: string }[],
+  edges: { id?: string; source: string; target: string; label?: string }[]
+) => {
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
   dagreGraph.setGraph({ rankdir: "LR" });
 
   nodes.forEach((node) => {
-    dagreGraph.setNode(node.id, { width: 60, height: 60 });
+    dagreGraph.setNode(node.id, { width: 70, height: 70 });
   });
 
   edges.forEach((edge) => {
@@ -56,30 +57,24 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
 
   return nodes.map((node) => {
     const nodeWithPosition = dagreGraph.node(node.id);
-    // Vérifier si le nœud a des arêtes entrantes ET sortantes
-    const hasOutgoing = edges.some((edge) => edge.source === node.id);
-    const hasIncoming = edges.some((edge) => edge.target === node.id);
-    const isFullyConnected = hasOutgoing && hasIncoming;
-
     return {
       ...node,
-      position: {
-        x: nodeWithPosition.x - 30,
-        y: nodeWithPosition.y - 30,
-      },
-      style: isFullyConnected ? connectedNodeStyle : defaultNodeStyle, // Gris si entrantes ET sortantes, sinon blanc
+      x: nodeWithPosition.x - 35,
+      y: nodeWithPosition.y - 35,
     };
   });
 };
 
-interface GraphProps {
-  nodes: Node[];
-  edges: Edge[];
-  setNodes: (nodes: Node[]) => void;
-  setEdges: (edges: Edge[]) => void;
-  onEdgeSelect: (edge: Edge) => void;
-  onNodeSelect: (node: Node) => void;
-}
+const areNodesEqual = (
+  nodesA: { id: string; label?: string; x?: number; y?: number }[],
+  nodesB: { id: string; label?: string; x?: number; y?: number }[]
+) => {
+  if (nodesA.length !== nodesB.length) return false;
+  return nodesA.every((nodeA, index) => {
+    const nodeB = nodesB[index];
+    return nodeA.id === nodeB.id && nodeA.label === nodeB.label;
+  });
+};
 
 export default function Graph({
   nodes,
@@ -88,47 +83,143 @@ export default function Graph({
   setEdges,
   onEdgeSelect,
   onNodeSelect,
+  finalMatrix = [],
+  solutionEdges = [],
+  changedCells = new Set(),
+  currentStep = 0,
+  showSolution = false,
 }: GraphProps) {
-  const onNodesChange = useCallback(
-    (changes: NodeChange[]) => setNodes(applyNodeChanges(changes, nodes)),
-    [nodes, setNodes]
-  );
-  const onEdgesChange = useCallback(
-    (changes: EdgeChange[]) => setEdges(applyEdgeChanges(changes, edges)),
-    [edges, setEdges]
-  );
-  const onEdgeClick = useCallback(
-    (event: React.MouseEvent, edge: Edge) => onEdgeSelect(edge),
-    [onEdgeSelect]
-  );
-  const onNodeClick = useCallback(
-    (event: React.MouseEvent, node: Node) => onNodeSelect(node),
-    [onNodeSelect]
-  );
+  const containerRef = useRef<HTMLDivElement>(null);
+  const networkRef = useRef<Network | null>(null);
+
+  const updateGraph = useCallback(() => {
+    if (!containerRef.current) return;
+
+    const layoutedNodes = getLayoutedElements(nodes, edges).map((node) => {
+      const isFinalSolution = currentStep === nodes.length - 1;
+      const nodeIndex = nodes.findIndex((n) => n.id === node.id);
+      const isSolutionNode =
+        isFinalSolution &&
+        (finalMatrix.some((row, i) => i !== nodeIndex && row[nodeIndex] !== "+∞") ||
+          finalMatrix[nodeIndex]?.some((val, j) => j !== nodeIndex && val !== "+∞"));
+      return {
+        ...node,
+        label: node.label || `S${node.id}`,
+        style: isSolutionNode ? solutionNodeStyle : defaultNodeStyle,
+      };
+    });
+
+    if (!areNodesEqual(layoutedNodes, nodes)) {
+      setNodes(layoutedNodes);
+    }
+
+    const visEdges = edges.map((edge) => {
+      const sourceIndex = nodes.findIndex((n) => n.id === edge.source);
+      const targetIndex = nodes.findIndex((n) => n.id === edge.target);
+      const isSolutionEdge =
+        showSolution &&
+        solutionEdges.some(
+          (se) => se.source === edge.source && se.target === edge.target
+        );
+      const isChangedEdge = changedCells.has(`${sourceIndex}-${targetIndex}`);
+
+      let edgeStyle: any = {
+        id: edge.id || `${edge.source}-${edge.target}`,
+        from: edge.source,
+        to: edge.target,
+        label: edge.label || "",
+        arrows: { to: { enabled: true, type: "arrow" } },
+        font: { size: 14, color: "#1B1B1B", face: "Roboto", bold: true },
+        color: { color: "#2E86C1", highlight: "#1B6B93" },
+        width: 2,
+        dashes: false,
+      };
+
+      if (isChangedEdge) {
+        edgeStyle = {
+          ...edgeStyle,
+          color: { color: "#FFA500", highlight: "#FF8C00" }, // Orange for changed edges
+          dashes: [8, 4],
+          width: 3,
+        };
+      } else if (isSolutionEdge) {
+        edgeStyle = {
+          ...edgeStyle,
+          color: { color: "#FF0000", highlight: "#FF3333" }, // Red for solution path
+          width: 4,
+          dashes: false,
+        };
+      }
+
+      return edgeStyle;
+    });
+
+    const data = {
+      nodes: layoutedNodes.map((node) => ({
+        id: node.id,
+        label: node.label,
+        x: node.x,
+        y: node.y,
+        shape: node.style.shape,
+        size: node.style.size,
+        borderWidth: node.style.borderWidth,
+        borderWidthSelected: node.style.borderWidthSelected,
+        color: node.style.color,
+        font: { ...node.style.font, bold: node.style.font.bold ? "bold" : undefined },
+        shadow: node.style.shadow,
+      })),
+      edges: visEdges,
+    };
+
+    const options = {
+      physics: false,
+      autoResize: true,
+      interaction: { zoomView: true, dragView: true, hover: true, selectable: true },
+      edges: {
+        arrows: { to: { enabled: true, type: "arrow" } },
+        smooth: { enabled: true, type: "cubicBezier", roundness: 0.3 },
+        font: { align: "top" },
+        hoverWidth: 1.5,
+      },
+      nodes: {
+        shape: "circle",
+        font: { size: 16, face: "Roboto" },
+      },
+    };
+
+    if (!networkRef.current) {
+      networkRef.current = new Network(containerRef.current, data, options);
+      networkRef.current.on("click", (params: any) => {
+        if (params.nodes.length > 0) {
+          const nodeId = params.nodes[0];
+          const node = layoutedNodes.find((n) => n.id === nodeId);
+          if (node) {
+            onNodeSelect(node);
+          }
+        } else if (params.edges.length > 0) {
+          const edgeId = params.edges[0];
+          const edge = visEdges.find((e) => e.id === edgeId);
+          if (edge) {
+            onEdgeSelect({ id: edge.id, source: edge.from, target: edge.to, label: edge.label });
+          }
+        }
+      });
+    } else {
+      networkRef.current.setData(data);
+      networkRef.current.fit();
+    }
+  }, [nodes, edges, finalMatrix, solutionEdges, changedCells, currentStep, showSolution, setNodes, onNodeSelect, onEdgeSelect]);
 
   useEffect(() => {
-    setNodes(getLayoutedElements(nodes, edges));
-  }, [nodes.length, edges.length, setNodes]);
+    updateGraph();
+  }, [updateGraph]);
 
   return (
-    <div className="flex-1 h-[600px] bg-white border-2 border-gray-300 rounded-lg shadow-lg p-4">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges.map((edge) => ({
-          ...edge,
-          style: { strokeWidth: 2, stroke: "#222" }, // Noir foncé pour les arêtes
-          markerEnd: { type: MarkerType.ArrowClosed, color: "#222" }, // Flèche noire foncée
-          labelStyle: { fontSize: "18px", fontWeight: "bold", fill: "#000" }, // Taille augmentée pour les poids
-        }))}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onEdgeClick={onEdgeClick}
-        onNodeClick={onNodeClick}
-      >
-        <Background gap={12} size={1} color="#e5e7eb" />
-        <MiniMap nodeColor={() => "rgba(128, 128, 128, 0.5)"} className="border border-gray-200 rounded-md" />
-        <Controls className="bg-white shadow-md rounded-md" />
-      </ReactFlow>
+    <div className="p-6 w-full lg:w-2/3">
+      <div
+        ref={containerRef}
+        className="h-[600px] border-2 border-gray-200 rounded-lg shadow-md bg-white transition-all duration-300"
+      />
     </div>
   );
 }

@@ -1,58 +1,105 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Graph from "../components/Graph";
-import NodeFormModal from "../components/NodeFormModal";
-import EdgeFormModal from "../components/EdgeFormModal";
-import MaxMatrixTable from "../components/MaxMatrixTable";
-import { Node, Edge } from "reactflow";
+import React, { useState, useEffect, useCallback } from "react";
+import Graph from "../components/MaxGraph";
+import FormModal from "../components/FormModal";
+import DemoucronMaxMatrixTable from "../components/MaxMatrixTable";
 import { FaCircle, FaArrowRight, FaTrash } from "react-icons/fa";
+
+interface Node {
+  id: string;
+  label?: string;
+  x?: number;
+  y?: number;
+}
+
+interface Edge {
+  id?: string;
+  source: string;
+  target: string;
+  label?: string;
+}
 
 export default function Page() {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [selectedEdge, setSelectedEdge] = useState<Edge | null>(null);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
-  const [isNodeModalOpen, setIsNodeModalOpen] = useState(false);
-  const [isEdgeModalOpen, setIsEdgeModalOpen] = useState(false);
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<"node" | "edge">("node");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [finalMatrix, setFinalMatrix] = useState<(number | string)[][]>([]);
+  const [solutionEdges, setSolutionEdges] = useState<{ source: string; target: string }[]>([]);
+  const [changedCells, setChangedCells] = useState<Set<string>>(new Set());
+  const [currentStep, setCurrentStep] = useState<number>(0);
+  const [showSolution, setShowSolution] = useState<boolean>(false);
 
   useEffect(() => {
-    const savedNodes = localStorage.getItem("graphNodes");
-    const savedEdges = localStorage.getItem("graphEdges");
-    if (savedNodes) setNodes(JSON.parse(savedNodes));
-    if (savedEdges) setEdges(JSON.parse(savedEdges));
+    try {
+      const savedNodes = localStorage.getItem("graphNodes");
+      const savedEdges = localStorage.getItem("graphEdges");
+      if (savedNodes) setNodes(JSON.parse(savedNodes));
+      if (savedEdges) setEdges(JSON.parse(savedEdges));
+    } catch (error) {
+      console.error("Erreur lors de la lecture de localStorage:", error);
+    }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("graphNodes", JSON.stringify(nodes));
+    try {
+      localStorage.setItem("graphNodes", JSON.stringify(nodes));
+    } catch (error) {
+      console.error("Erreur lors de l'écriture des nœuds dans localStorage:", error);
+    }
   }, [nodes]);
 
   useEffect(() => {
-    localStorage.setItem("graphEdges", JSON.stringify(edges));
+    try {
+      localStorage.setItem("graphEdges", JSON.stringify(edges));
+    } catch (error) {
+      console.error("Erreur lors de l'écriture des arêtes dans localStorage:", error);
+    }
   }, [edges]);
 
-  const handleEdgeSelect = (edge: Edge) => {
+  const handleEdgeSelect = useCallback((edge: Edge) => {
     setSelectedEdge(edge);
     setSelectedNode(null);
-    setIsEdgeModalOpen(true);
-  };
+    setModalMode("edge");
+    setIsFormModalOpen(true);
+  }, []);
 
-  const handleNodeSelect = (node: Node) => {
+  const handleNodeSelect = useCallback((node: Node) => {
     setSelectedNode(node);
     setSelectedEdge(null);
-    setIsNodeModalOpen(true);
-  };
+    setModalMode("node");
+    setIsFormModalOpen(true);
+  }, []);
 
   const confirmClearData = () => {
     setNodes([]);
     setEdges([]);
     setSelectedNode(null);
     setSelectedEdge(null);
-    localStorage.removeItem("graphNodes");
-    localStorage.removeItem("graphEdges");
+    setFinalMatrix([]);
+    setSolutionEdges([]);
+    setChangedCells(new Set());
+    setCurrentStep(0);
+    setShowSolution(false);
+    try {
+      localStorage.removeItem("graphNodes");
+      localStorage.removeItem("graphEdges");
+    } catch (error) {
+      console.error("Erreur lors de la suppression de localStorage:", error);
+    }
     setIsConfirmModalOpen(false);
   };
+
+  const handleCloseModal = useCallback(() => {
+    setIsFormModalOpen(false);
+    setSelectedNode(null);
+    setSelectedEdge(null);
+    setModalMode("node");
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100 p-4">
@@ -64,17 +111,28 @@ export default function Page() {
           setEdges={setEdges}
           onEdgeSelect={handleEdgeSelect}
           onNodeSelect={handleNodeSelect}
+          finalMatrix={finalMatrix}
+          solutionEdges={solutionEdges}
+          changedCells={changedCells}
+          currentStep={currentStep}
+          showSolution={showSolution}
         />
         <div className="w-full lg:w-1/3 flex flex-col gap-3">
           <button
-            onClick={() => setIsNodeModalOpen(true)}
+            onClick={() => {
+              setModalMode("node");
+              setIsFormModalOpen(true);
+            }}
             className="flex items-center gap-2 bg-blue-600 text-white py-1.5 px-2 rounded-lg shadow-md hover:bg-blue-700 transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-40 whitespace-nowrap"
           >
             <FaCircle className="text-sm" />
             Gérer les sommets
           </button>
           <button
-            onClick={() => setIsEdgeModalOpen(true)}
+            onClick={() => {
+              setModalMode("edge");
+              setIsFormModalOpen(true);
+            }}
             className="flex items-center gap-2 bg-blue-600 text-white py-1.5 px-2 rounded-lg shadow-md hover:bg-blue-700 transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-40 whitespace-nowrap"
           >
             <FaArrowRight className="text-sm" />
@@ -87,7 +145,20 @@ export default function Page() {
             <FaTrash className="text-sm" />
             Vider les données
           </button>
-          <MaxMatrixTable nodes={nodes} edges={edges} />
+          <DemoucronMaxMatrixTable
+            nodes={nodes}
+            edges={edges}
+            currentStep={currentStep}
+            onFinalValuesCalculated={(matrix, edges) => {
+              setFinalMatrix(matrix);
+              setSolutionEdges(edges);
+            }}
+            onStepChange={(step, changedCells, currentMatrix, newStep, showSolution) => {
+              setChangedCells(changedCells);
+              setCurrentStep(newStep);
+              setShowSolution(showSolution || false);
+            }}
+          />
         </div>
       </div>
 
@@ -116,22 +187,16 @@ export default function Page() {
         </div>
       )}
 
-      <NodeFormModal
-        isOpen={isNodeModalOpen}
-        onClose={() => setIsNodeModalOpen(false)}
+      <FormModal
+        isOpen={isFormModalOpen}
+        onClose={handleCloseModal}
+        initialMode={modalMode}
         nodes={nodes}
         edges={edges}
         setNodes={setNodes}
         setEdges={setEdges}
         selectedNode={selectedNode}
         setSelectedNode={setSelectedNode}
-      />
-      <EdgeFormModal
-        isOpen={isEdgeModalOpen}
-        onClose={() => setIsEdgeModalOpen(false)}
-        nodes={nodes}
-        edges={edges}
-        setEdges={setEdges}
         selectedEdge={selectedEdge}
         setSelectedEdge={setSelectedEdge}
       />
