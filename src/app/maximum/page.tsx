@@ -102,7 +102,7 @@ export default function Page() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100 p-4">
+    <div className="flex flex-col items-center justify-center bg-gradient-to-br bg-gray-100 p-4 mt-10 mb-5">
       <div className="flex flex-col lg:flex-row gap-6 w-full max-w-7xl">
         <Graph
           nodes={nodes}

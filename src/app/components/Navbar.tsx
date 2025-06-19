@@ -9,34 +9,37 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const isActive = (path: string) => {
-    return pathname === path ? "text-blue-600 underline" : "text-gray-600";
+    return pathname === path ? "text-blue-400 underline" : "text-gray-300";
   };
 
   return (
-    <nav className="w-full px-4 py-2 bg-white border shadow-md rounded-xl border-white/80 bg-opacity-80 backdrop-blur-2xl backdrop-saturate-200 lg:px-8 lg:py-3">
-      <div className="flex flex-wrap items-center justify-between text-gray-600">
+    <nav className="w-full px-10 py-10 bg-gray-900 text-white shadow-md">
+      <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between">
         <div>
           <Link href="/">
-            <span className="text-2xl font-bold cursor-pointer">Algorithme de DEMOUCRON</span>
+            <span className="text-2xl font-bold text-white cursor-pointer">
+              Algorithme de DEMOUCRON
+            </span>
           </Link>
         </div>
-        <button onClick={() => setIsOpen(!isOpen)} className="lg:hidden">
-          ☰
-        </button>
-        <div className={`lg:flex ${isOpen ? "block" : "hidden"}`}>
-          <ul className="flex flex-col gap-2 my-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6 mr-10">
-            <li className={`text-lg hover:text-blue-700 ${isActive("/")}`}>
-              <Link href="/" className="flex items-center transition-colors">
+        <div
+          className={`w-full lg:flex lg:items-center lg:w-auto ${
+            isOpen ? "block mt-4" : "hidden"
+          } lg:mt-0`}
+        >
+          <ul className="flex flex-col gap-3 lg:flex-row lg:gap-8 text-lg font-medium">
+            <li className={`hover:text-blue-400 ${isActive("/")}`}>
+              <Link href="/" className="transition-colors duration-200">
                 Accueil
               </Link>
             </li>
-            <li className={`text-lg hover:text-blue-700 ${isActive("/minimum")}`}>
-              <Link href="/minimum" className="flex items-center transition-colors">
+            <li className={`hover:text-blue-400 ${isActive("/minimum")}`}>
+              <Link href="/minimum" className="transition-colors duration-200">
                 Minimum
               </Link>
             </li>
-            <li className={`text-lg hover:text-blue-700 ${isActive("/maximum")}`}>
-              <Link href="/maximum" className="flex items-center transition-colors">
+            <li className={`hover:text-blue-400 ${isActive("/maximum")}`}>
+              <Link href="/maximum" className="transition-colors duration-200">
                 Maximum
               </Link>
             </li>
