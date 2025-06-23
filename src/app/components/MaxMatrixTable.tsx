@@ -228,7 +228,7 @@ export default function DemoucronMaxMatrixTable({
       changedCellsByStep: computedData.changedCellsByStep,
       predecessors: computedData.predecessors,
     });
-setShowSolution(false);
+    setShowSolution(false);
 
     const finalMatrixStr = JSON.stringify(computedData.finalMatrix);
     const solutionEdgesStr = JSON.stringify(computedData.solutionEdges);
@@ -379,7 +379,7 @@ setShowSolution(false);
           {currentCalculations.length > 0 && (
             <div className="mt-4">
               <h3 className="text-md font-semibold text-gray-800 mb-2">
-                Calculs pour l'étape {currentStep === 0 ? 'Initiale' : `k=${currentStep}`}
+                Calculs pour létape {currentStep === 0 ? 'Initiale' : `k=${currentStep}`}
               </h3>
               <div className="text-gray-700">
                 {currentCalculations.map((rowCalcs, rowIndex) =>

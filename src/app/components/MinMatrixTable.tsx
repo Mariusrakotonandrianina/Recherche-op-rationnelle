@@ -369,7 +369,7 @@ export default function MinMatrixTable({
           {currentCalculations.length > 0 && currentCalculations.some((row) => row.some((calc) => calc)) && (
             <div className="mt-4">
               <h3 className="text-md font-semibold text-gray-800 mb-2">
-                Calculs pour l'étape {currentStep === 0 ? 'Initiale' : `k=${currentStep}`}
+                Calculs pour létape {currentStep === 0 ? 'Initiale' : `k=${currentStep}`}
               </h3>
               <div className="text-gray-700">
                 {currentCalculations.map((rowCalcs, rowIndex) =>

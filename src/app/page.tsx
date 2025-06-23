@@ -9,14 +9,14 @@ export default function Home() {
         {/* Left: Project Description */}
         <div className="flex flex-col justify-center space-y-4">
           <h2 className="text-4xl font-bold mb-2 animate-slide-down">
-            Optimisation de Parcours <br />avec l'Algorithme de Demoucron
+            Optimisation de Parcours <br />avec l Algorithme de Demoucron
           </h2>
           <p className="text-lg leading-relaxed opacity-90">
-            Bienvenue sur notre site dédié à l'optimisation de parcours ! Nous utilisons
-            l'algorithme de Demoucron pour calculer le chemin optimal et minimal dans un
+            Bienvenue sur notre site dédié à l optimisation de parcours ! Nous utilisons
+            l algorithme de Demoucron pour calculer le chemin optimal et minimal dans un
             graphe orienté acyclique (DAG). Cet algorithme performant permet de déterminer
-            l'ordre topologique ou le chemin critique, idéal pour la planification de
-            projets, l'ordonnancement des tâches ou la navigation optimisée.
+            l ordre topologique ou le chemin critique, idéal pour la planification de
+            projets, l ordonnancement des tâches ou la navigation optimisée.
           </p>
           <p className="text-lg leading-relaxed opacity-90">
             Entrez vos données, et notre outil vous fournira une solution précise et rapide,

@@ -392,7 +392,7 @@ export default function FormModal({
             <div className="mt-4">
               <h3 className="text-md font-semibold text-gray-800 mb-2">Confirmer la suppression</h3>
               <p className="text-sm text-gray-600 mb-2">
-                Voulez-vous vraiment supprimer le sommet "{selectedNode.id}" ? Cela supprimera également toutes les arêtes associées.
+                Voulez-vous vraiment supprimer le sommet {selectedNode.id} ? Cela supprimera également toutes les arêtes associées.
               </p>
               <div className="flex justify-end gap-2">
                 <button
@@ -500,7 +500,7 @@ export default function FormModal({
             <div className="mt-4">
               <h3 className="text-md font-semibold text-gray-800 mb-2">Confirmer la suppression</h3>
               <p className="text-sm text-gray-600 mb-2">
-                Voulez-vous vraiment supprimer l'arête "{selectedEdge.source} → {selectedEdge.target}" ?
+                Voulez-vous vraiment supprimer l arête {selectedEdge.source} → {selectedEdge.target} ?
               </p>
               <div className="flex justify-end gap-2">
                 <button
