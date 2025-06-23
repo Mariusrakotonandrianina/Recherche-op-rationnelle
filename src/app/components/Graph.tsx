@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
-import { Network } from "vis-network/standalone/esm/vis-network";
+import { Network, IdType, Edge as VisEdge, Node as VisNode } from "vis-network/standalone/esm/vis-network";
 import dagre from "dagre";
 
 interface GraphProps {
@@ -56,7 +56,7 @@ const getLayoutedElements = (
   dagre.layout(dagreGraph);
 
   return nodes.map((node) => {
-    const nodeWithPosition = dagreGraph.node(node.id);
+    const nodeWithPosition = dagreGraph.node(node.id) as { x: number; y: number };
     return {
       ...node,
       x: nodeWithPosition.x - 35,
@@ -112,7 +112,7 @@ export default function Graph({
       setNodes(layoutedNodes);
     }
 
-    const visEdges = edges.map((edge) => {
+    const visEdges: VisEdge[] = edges.map((edge) => {
       const sourceIndex = nodes.findIndex((n) => n.id === edge.source);
       const targetIndex = nodes.findIndex((n) => n.id === edge.target);
       const isSolutionEdge =
@@ -122,35 +122,34 @@ export default function Graph({
         );
       const isChangedEdge = changedCells.has(`${sourceIndex}-${targetIndex}`);
 
-      let edgeStyle: any = {
+      const baseEdge: VisEdge = {
         id: edge.id || `${edge.source}-${edge.target}`,
         from: edge.source,
         to: edge.target,
         label: edge.label || "",
         arrows: { to: { enabled: true, type: "arrow" } },
-        font: { size: 14, color: "#1B1B1B", face: "Roboto", bold: true },
+        font: { size: 14, color: "#1B1B1B", face: "Roboto" },
         color: { color: "#2E86C1", highlight: "#1B6B93" },
         width: 2,
-        dashes: false,
       };
 
       if (isChangedEdge) {
-        edgeStyle = {
-          ...edgeStyle,
-          color: { color: "#FFA500", highlight: "#FF8C00" }, // Orange for changed edges
+        return {
+          ...baseEdge,
+          color: { color: "#FFA500", highlight: "#FF8C00" },
           dashes: [8, 4],
           width: 3,
         };
       } else if (isSolutionEdge) {
-        edgeStyle = {
-          ...edgeStyle,
-          color: { color: "#FF0000", highlight: "#FF3333" }, // Red for solution path
+        return {
+          ...baseEdge,
+          color: { color: "#FF0000", highlight: "#FF3333" },
           width: 4,
           dashes: false,
         };
       }
 
-      return edgeStyle;
+      return { ...baseEdge, dashes: false };
     });
 
     const data = {
@@ -188,7 +187,7 @@ export default function Graph({
 
     if (!networkRef.current) {
       networkRef.current = new Network(containerRef.current, data, options);
-      networkRef.current.on("click", (params: any) => {
+      networkRef.current.on("click", (params: { nodes: IdType[]; edges: IdType[] }) => {
         if (params.nodes.length > 0) {
           const nodeId = params.nodes[0];
           const node = layoutedNodes.find((n) => n.id === nodeId);
@@ -199,10 +198,15 @@ export default function Graph({
           const edgeId = params.edges[0];
           const edge = visEdges.find((e) => e.id === edgeId);
           if (edge) {
-            onEdgeSelect({ id: edge.id, source: edge.from, target: edge.to, label: edge.label });
+            onEdgeSelect({
+              id: edge.id !== undefined ? String(edge.id) : undefined,
+              source: String(edge.from),
+              target: String(edge.to),
+              label: edge.label,
+            });
           }
         }
-      });
+      });      
     } else {
       networkRef.current.setData(data);
       networkRef.current.fit();
