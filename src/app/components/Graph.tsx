@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
-import { Network, IdType, Edge as VisEdge, Node as VisNode } from "vis-network/standalone/esm/vis-network";
+import { Network, IdType, Edge as VisEdge } from "vis-network/standalone/esm/vis-network";
 import dagre from "dagre";
 
 interface GraphProps {
