@@ -47,7 +47,7 @@ export default function DemoucronMaxMatrixTable({
   onFinalValuesCalculated,
   onStepChange,
 }: DemoucronMaxMatrixTableProps) {
-  const [showSolution, setShowSolution] = useState(false);
+  const [, setShowSolution] = useState(false);
   const [state, setState] = useState<State>({
     matrices: [],
     calculations: [],
@@ -228,7 +228,7 @@ export default function DemoucronMaxMatrixTable({
       changedCellsByStep: computedData.changedCellsByStep,
       predecessors: computedData.predecessors,
     });
-    setShowSolution(false);
+setShowSolution(false);
 
     const finalMatrixStr = JSON.stringify(computedData.finalMatrix);
     const solutionEdgesStr = JSON.stringify(computedData.solutionEdges);
@@ -306,7 +306,6 @@ export default function DemoucronMaxMatrixTable({
   const handleShowSolution = () => {
     if (currentStep === state.matrices.length - 1) {
       setShowSolution(true);
-      //console.log("Affichage de la solution, étape:", currentStep); // Journal de débogage
       if (onStepChange) {
         onStepChange(
           currentStep,
@@ -380,7 +379,7 @@ export default function DemoucronMaxMatrixTable({
           {currentCalculations.length > 0 && (
             <div className="mt-4">
               <h3 className="text-md font-semibold text-gray-800 mb-2">
-                Calculs pour l'étape {currentStep === 0 ? "Initiale" : `k=${currentStep}`}
+                Calculs pour l'étape {currentStep === 0 ? 'Initiale' : `k=${currentStep}`}
               </h3>
               <div className="text-gray-700">
                 {currentCalculations.map((rowCalcs, rowIndex) =>

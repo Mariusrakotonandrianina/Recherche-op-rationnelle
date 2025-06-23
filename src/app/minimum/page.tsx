@@ -38,7 +38,7 @@ export default function Page() {
   const [finalMatrix, setFinalMatrix] = useState<(number | string)[][]>([]);
   const [solutionEdges, setSolutionEdges] = useState<{ source: string; target: string }[]>([]);
   const [changedCells, setChangedCells] = useState<Set<string>>(new Set());
-  const [currentMatrix, setCurrentMatrix] = useState<(number | string)[][]>([]);
+  const [, setCurrentMatrix] = useState<(number | string)[][]>([]);
   const [currentStep, setCurrentStep] = useState(0);
 
   const memoizedNodes = useMemo(() => nodes, [nodes]);

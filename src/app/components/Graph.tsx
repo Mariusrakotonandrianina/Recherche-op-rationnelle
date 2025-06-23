@@ -80,7 +80,6 @@ export default function Graph({
   nodes,
   edges,
   setNodes,
-  setEdges,
   onEdgeSelect,
   onNodeSelect,
   finalMatrix = [],

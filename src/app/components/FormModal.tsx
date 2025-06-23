@@ -93,7 +93,7 @@ export default function FormModal({
       return false;
     }
     if (nodes.some((node) => node.id === nodeId)) {
-      setError(`Un nœud avec l'ID "${nodeId}" existe déjà. Essayez un autre ID.`);
+      setError(`Un nœud avec l'ID '${nodeId}' existe déjà. Essayez un autre ID.`);
       return false;
     }
     return true;
@@ -105,7 +105,7 @@ export default function FormModal({
       return false;
     }
     if (!nodes.find((node) => node.id === sourceNode) || !nodes.find((node) => node.id === targetNode)) {
-      setError(`Les sommets "${sourceNode}" ou "${targetNode}" n'existent pas.`);
+      setError(`Les sommets '${sourceNode}' ou '${targetNode}' n'existent pas.`);
       return false;
     }
     if (sourceNode === targetNode) {
@@ -113,7 +113,7 @@ export default function FormModal({
       return false;
     }
     if (edges.some((edge) => edge.source === sourceNode && edge.target === targetNode)) {
-      setError(`Une arête de "${sourceNode}" à "${targetNode}" existe déjà.`);
+      setError(`Une arête de '${sourceNode}' à '${targetNode}' existe déjà.`);
       return false;
     }
     if (!/^[1-9]\d*$/.test(edgeLabel)) {
@@ -136,7 +136,7 @@ export default function FormModal({
     };
 
     setNodes([...nodes, newNode]);
-    setSuccess(`Sommet "${newNode.label}" ajouté avec succès.`);
+    setSuccess(`Sommet '${newNode.label}' ajouté avec succès.`);
     setNodeId("");
     setNodeLabel("");
     nodeIdInputRef.current?.focus();
@@ -156,7 +156,7 @@ export default function FormModal({
       )
     );
     setSelectedNode({ ...selectedNode, label: editNodeLabel });
-    setSuccess(`Sommet "${selectedNode.id}" modifié en "${editNodeLabel}".`);
+    setSuccess(`Sommet '${selectedNode.id}' modifié en '${editNodeLabel}'.`);
     setEditNodeLabel("");
     setSelectedNode(null);
   };
@@ -172,7 +172,7 @@ export default function FormModal({
         (edge) => edge.source !== selectedNode.id && edge.target !== selectedNode.id
       )
     );
-    setSuccess(`Sommet "${selectedNode.id}" supprimé avec succès.`);
+    setSuccess(`Sommet '${selectedNode.id}' supprimé avec succès.`);
     setSelectedNode(null);
     setEditNodeLabel("");
     setShowNodeDeleteConfirm(false);
@@ -191,7 +191,7 @@ export default function FormModal({
     };
 
     setEdges([...edges, newEdge]);
-    setSuccess(`Arête "${sourceNode} → ${targetNode}" ajoutée avec succès.`);
+    setSuccess(`Arête '${sourceNode} → ${targetNode}' ajoutée avec succès.`);
     setSourceNode("");
     setTargetNode("");
     setEdgeLabel("");
@@ -227,7 +227,7 @@ export default function FormModal({
     setError(null);
     setSuccess(null);
     setEdges(edges.filter((edge) => edge.id !== selectedEdge.id));
-    setSuccess(`Arête "${selectedEdge.source} → ${selectedEdge.target}" supprimée avec succès.`);
+    setSuccess(`Arête '${selectedEdge.source} → ${selectedEdge.target} supprimée avec succès.`);
     setSelectedEdge(null);
     setEditEdgeLabel("");
     setShowEdgeDeleteConfirm(false);

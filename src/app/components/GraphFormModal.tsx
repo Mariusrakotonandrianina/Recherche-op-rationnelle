@@ -96,7 +96,7 @@ export default function GraphFormModal({
       return false;
     }
     if (!nodes.find((node) => node.id === sourceNode) || !nodes.find((node) => node.id === targetNode)) {
-      setError(`Les sommets "${sourceNode}" ou "${targetNode}" n'existent pas.`);
+      setError(`Les sommets '${sourceNode}' ou '${targetNode}' n'existent pas.`);
       return false;
     }
     if (sourceNode === targetNode) {
@@ -104,7 +104,7 @@ export default function GraphFormModal({
       return false;
     }
     if (edges.some((edge) => edge.source === sourceNode && edge.target === targetNode)) {
-      setError(`Une arête de "${sourceNode}" à "${targetNode}" existe déjà.`);
+      setError(`Une arête de '${sourceNode}' à '${targetNode}' existe déjà.`);
       return false;
     }
     if (isNaN(Number(edgeLabel)) || Number(edgeLabel) <= 0) {
@@ -126,7 +126,7 @@ export default function GraphFormModal({
 
     console.log("Adding node:", newNode);
     setNodes([...nodes, newNode]);
-    setSuccess(`Sommet "${newNode.label}" ajouté avec succès.`);
+    setSuccess(`Sommet '${newNode.label}' ajouté avec succès.`);
     setNodeId("");
     setNodeLabel("");
     nodeIdInputRef.current?.focus();
@@ -147,9 +147,9 @@ export default function GraphFormModal({
       )
     );
     setSelectedNode({ ...selectedNode, label: editNodeLabel });
-    setSuccess(`Sommet "${selectedNode.id}" modifié en "${editNodeLabel}".`);
+    setSuccess(`Sommet '${selectedNode.id}' modifié en '${editNodeLabel}'.`);
     setEditNodeLabel("");
-    setSelectedNode(null); // Réinitialiser après modification
+    setSelectedNode(null);
   };
 
   const confirmDeleteNode = () => {
@@ -164,7 +164,7 @@ export default function GraphFormModal({
         (edge) => edge.source !== selectedNode.id && edge.target !== selectedNode.id
       )
     );
-    setSuccess(`Sommet "${selectedNode.id}" supprimé avec succès.`);
+    setSuccess(`Sommet '${selectedNode.id}' supprimé avec succès.`);
     setSelectedNode(null);
     setEditNodeLabel("");
     setShowNodeDeleteConfirm(false);
@@ -184,7 +184,7 @@ export default function GraphFormModal({
 
     console.log("Adding edge:", newEdge);
     setEdges([...edges, newEdge]);
-    setSuccess(`Arête "${sourceNode} → ${targetNode}" ajoutée avec succès.`);
+    setSuccess(`Arête '${sourceNode} → ${targetNode}' ajoutée avec succès.`);
     setSourceNode("");
     setTargetNode("");
     setEdgeLabel("");
@@ -210,7 +210,7 @@ export default function GraphFormModal({
       )
     );
     setSelectedEdge({ ...selectedEdge, label: editEdgeLabel });
-    setSuccess(`Arête "${selectedEdge.source} → ${selectedEdge.target}" modifiée en poids "${editEdgeLabel}".`);
+    setSuccess(`Arête '${selectedEdge.source} → ${selectedEdge.target}' modifiée en poids '${editEdgeLabel}'.`);
     setEditEdgeLabel("");
     setSelectedEdge(null); // Réinitialiser après modification
   };
@@ -222,7 +222,7 @@ export default function GraphFormModal({
     setSuccess(null);
     console.log("Deleting edge:", selectedEdge);
     setEdges(edges.filter((edge) => edge.id !== selectedEdge.id));
-    setSuccess(`Arête "${selectedEdge.source} → ${selectedEdge.target}" supprimée avec succès.`);
+    setSuccess(`Arête '${selectedEdge.source} → ${selectedEdge.target}' supprimée avec succès.`);
     setSelectedEdge(null);
     setEditEdgeLabel("");
     setShowEdgeDeleteConfirm(false);
@@ -389,7 +389,7 @@ export default function GraphFormModal({
             <div className="mt-4">
               <h3 className="text-md font-semibold text-gray-800 mb-2">Confirmer la suppression</h3>
               <p className="text-sm text-gray-600 mb-2">
-                Voulez-vous vraiment supprimer le sommet "{selectedNode.id}" ? Cela supprimera également toutes les arêtes associées.
+                Voulez-vous vraiment supprimer le sommet '{selectedNode.id}' ? Cela supprimera également toutes les arêtes associées.
               </p>
               <div className="flex justify-end gap-2">
                 <button
