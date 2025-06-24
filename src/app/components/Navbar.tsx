@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function Navbar() {
-  const [isOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
   const isActive = (path: string) => {
@@ -13,7 +13,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="w-full px-10 py-10 bg-gray-900 text-white shadow-md">
+    <nav className="w-full px-10 py-5 bg-gray-900 text-white shadow-md">
       <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between">
         <div>
           <Link href="/">
@@ -22,6 +22,15 @@ export default function Navbar() {
             </span>
           </Link>
         </div>
+
+        {/* Bouton pour mobile */}
+        <button
+          className="lg:hidden text-white"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          ☰
+        </button>
+
         <div
           className={`w-full lg:flex lg:items-center lg:w-auto ${
             isOpen ? "block mt-4" : "hidden"

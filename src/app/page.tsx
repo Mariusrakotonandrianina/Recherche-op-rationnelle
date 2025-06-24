@@ -4,19 +4,19 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="bg-gradient-to-br py-50 bg-gradient-to-br from-gray-900 to-blue-900 flex items-center justify-center text-white">
+    <div className="bg-gradient-to-br py-35 bg-gradient-to-br from-gray-900 to-blue-900 flex items-center justify-center text-white">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
         {/* Left: Project Description */}
         <div className="flex flex-col justify-center space-y-4">
           <h2 className="text-4xl font-bold mb-2 animate-slide-down">
-            Optimisation de Parcours <br />avec l Algorithme de Demoucron
+            Optimisation de Parcours <br />avec l&apos;Algorithme de Demoucron
           </h2>
           <p className="text-lg leading-relaxed opacity-90">
-            Bienvenue sur notre site dédié à l optimisation de parcours ! Nous utilisons
-            l algorithme de Demoucron pour calculer le chemin optimal et minimal dans un
+            Bienvenue sur notre site dédié à l&apos;optimisation de parcours ! Nous utilisons
+            l&apos;algorithme de Demoucron pour calculer le chemin optimal et minimal dans un
             graphe orienté acyclique (DAG). Cet algorithme performant permet de déterminer
-            l ordre topologique ou le chemin critique, idéal pour la planification de
-            projets, l ordonnancement des tâches ou la navigation optimisée.
+            l&apos;ordre topologique ou le chemin critique, idéal pour la planification de
+            projets, l&apos;ordonnancement des tâches ou la navigation optimisée.
           </p>
           <p className="text-lg leading-relaxed opacity-90">
             Entrez vos données, et notre outil vous fournira une solution précise et rapide,
