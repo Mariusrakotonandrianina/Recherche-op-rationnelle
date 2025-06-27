@@ -4,9 +4,8 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="bg-gradient-to-br py-35 bg-gradient-to-br from-gray-900 to-blue-900 flex items-center justify-center text-white">
+    <div className="bg-gradient-to-br py-40 bg-gradient-to-br from-gray-900 to-blue-900 flex items-center justify-center text-white">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-        {/* Left: Project Description */}
         <div className="flex flex-col justify-center space-y-4">
           <h2 className="text-4xl font-bold mb-2 animate-slide-down">
             Optimisation de Parcours <br />avec l&apos;Algorithme de Demoucron
@@ -29,7 +28,7 @@ export default function Home() {
         <div className="flex items-center justify-center">
           <div className="relative w-full max-w-md animate-float-slow">
             <Image
-              src="/images/ProgressVectors.jpeg"
+              src="/images/graph3.png"
               alt="Graph illustration for Demoucron's algorithm"
               width={800}
               height={800}
@@ -44,14 +43,14 @@ export default function Home() {
       <style jsx>{`
         @keyframes float-slow {
           0%, 100% {
-            transform: translateY(0);
+            transform: translateY(5);
           }
           50% {
-            transform: translateY(-8px);
+            transform: translateY(-15px);
           }
         }
         .animate-float-slow {
-          animation: float-slow 3s ease-in-out infinite;
+          animation: float-slow 5s ease-in-out infinite;
         }
 
         @keyframes slide-down {
