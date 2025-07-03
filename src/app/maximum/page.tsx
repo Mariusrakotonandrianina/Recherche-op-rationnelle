@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import Graph from "../components/MaxGraph";
 import FormModal from "../components/FormModal";
 import DemoucronMaxMatrixTable from "../components/MaxMatrixTable";

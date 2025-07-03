@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import Graph from "../components/Graph";
 import GraphFormModal from "../components/GraphFormModal";
 import MinMatrixTable from "../components/MinMatrixTable";
