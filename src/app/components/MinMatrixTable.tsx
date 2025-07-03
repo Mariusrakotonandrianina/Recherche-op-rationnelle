@@ -200,7 +200,16 @@ export default function MinMatrixTable({
           minValueCells.add(`${sourceIndex}-${targetIndex}`);
         }
       }
+   
     }
+
+    let minTotal = 0;
+    solutionEdges.forEach((edge) => {
+      const sourceIndex = nodes.findIndex((n) => n.id === edge.source);
+      const targetIndex = nodes.findIndex((n) => n.id === edge.target);
+      const value = finalMatrix[sourceIndex][targetIndex];
+      if (typeof value === "number") minTotal += value;
+    });
 
     return {
       matrices: allMatrices,
@@ -210,6 +219,7 @@ export default function MinMatrixTable({
       finalMatrix,
       solutionEdges,
       minValueCells,
+      minTotal,
     };
   }, [nodes, edges]);
 
@@ -319,6 +329,11 @@ export default function MinMatrixTable({
           ? "Matrice Initiale D₁"
           : `Matrice D${currentStep + 1} (Étape k=${currentStep})`}
       </h2>
+      {currentStep === state.matrices.length - 1 && (
+        <p className="text-md font-bold text-blue-700 mb-2">
+          Solution MIN = {computedData.minTotal}
+        </p>
+      )}
       {nodes.length === 0 ? (
         <p className="text-gray-600">Aucun sommet. Ajoutez des sommets pour commencer.</p>
       ) : (

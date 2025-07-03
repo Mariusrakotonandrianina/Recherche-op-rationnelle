@@ -5,6 +5,7 @@ import Graph from "../components/MaxGraph";
 import FormModal from "../components/FormModal";
 import DemoucronMaxMatrixTable from "../components/MaxMatrixTable";
 import { FaCircle, FaArrowRight, FaTrash } from "react-icons/fa";
+import { useGraphStorage } from "../hooks/useGraphStorage";
 
 interface Node {
   id: string;
@@ -21,8 +22,10 @@ interface Edge {
 }
 
 export default function Page() {
-  const [nodes, setNodes] = useState<Node[]>([]);
-  const [edges, setEdges] = useState<Edge[]>([]);
+
+  const { nodes, setNodes, edges, setEdges } = useGraphStorage();
+
+
   const [selectedEdge, setSelectedEdge] = useState<Edge | null>(null);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -34,32 +37,6 @@ export default function Page() {
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [showSolution, setShowSolution] = useState<boolean>(false);
 
-  useEffect(() => {
-    try {
-      const savedNodes = localStorage.getItem("graphNodes");
-      const savedEdges = localStorage.getItem("graphEdges");
-      if (savedNodes) setNodes(JSON.parse(savedNodes));
-      if (savedEdges) setEdges(JSON.parse(savedEdges));
-    } catch (error) {
-      console.error("Erreur lors de la lecture de localStorage:", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem("graphNodes", JSON.stringify(nodes));
-    } catch (error) {
-      console.error("Erreur lors de l'écriture des nœuds dans localStorage:", error);
-    }
-  }, [nodes]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem("graphEdges", JSON.stringify(edges));
-    } catch (error) {
-      console.error("Erreur lors de l'écriture des arêtes dans localStorage:", error);
-    }
-  }, [edges]);
 
   const handleEdgeSelect = useCallback((edge: Edge) => {
     setSelectedEdge(edge);

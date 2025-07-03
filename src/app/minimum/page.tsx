@@ -5,6 +5,7 @@ import Graph from "../components/Graph";
 import GraphFormModal from "../components/GraphFormModal";
 import MinMatrixTable from "../components/MinMatrixTable";
 import { FaCircle, FaArrowRight, FaTrash } from "react-icons/fa";
+import { useGraphStorage } from "../hooks/useGraphStorage";
 
 interface Node {
   id: string;
@@ -19,16 +20,10 @@ interface Edge {
 }
 
 export default function Page() {
-  const [nodes, setNodes] = useState<Node[]>([]);
-  const [edges, setEdges] = useState<Edge[]>([]);
-  const [showSolution, setShowSolution] = useState(false);
 
-  useEffect(() => {
-    const savedNodes = localStorage.getItem("graphNodes");
-    const savedEdges = localStorage.getItem("graphEdges");
-    if (savedNodes) setNodes(JSON.parse(savedNodes));
-    if (savedEdges) setEdges(JSON.parse(savedEdges));
-  }, []);
+  const { nodes, setNodes, edges, setEdges } = useGraphStorage();
+
+  const [showSolution, setShowSolution] = useState(false);
 
   const [selectedEdge, setSelectedEdge] = useState<Edge | null>(null);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
@@ -44,13 +39,6 @@ export default function Page() {
   const memoizedNodes = useMemo(() => nodes, [nodes]);
   const memoizedEdges = useMemo(() => edges, [edges]);
 
-  useEffect(() => {
-    localStorage.setItem("graphNodes", JSON.stringify(nodes));
-  }, [nodes]);
-
-  useEffect(() => {
-    localStorage.setItem("graphEdges", JSON.stringify(edges));
-  }, [edges]);
 
   const handleEdgeSelect = useCallback((edge: Edge) => {
     console.log("Page - handleEdgeSelect:", edge);
