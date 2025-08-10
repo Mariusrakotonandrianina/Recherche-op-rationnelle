@@ -40,7 +40,7 @@ export default function Home() {
                   <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"> Parcours</span>
                 </h1>
                 <p className="text-xl text-blue-200">
-                  avec l'Algorithme de <span className="font-semibold text-white">Demoucron</span>
+                  avec l&apos;Algorithme de <span className="font-semibold text-white">Demoucron</span>
                 </p>
               </div>
 
