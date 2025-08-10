@@ -94,7 +94,7 @@ export default function Page() {
           currentStep={currentStep}
           showSolution={showSolution}
         />
-        <div className="w-full lg:w-1/3 flex flex-col gap-3">
+        <div className="w-full lg:w-1/2 flex flex-col gap-3">
           <button
             onClick={() => {
               setModalMode("node");
