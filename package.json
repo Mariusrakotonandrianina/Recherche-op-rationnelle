@@ -17,6 +17,7 @@
     "@tailwindcss/postcss": "^4.0.14",
     "dagre": "^0.8.5",
     "gojs": "^3.0.19",
+    "lucide-react": "^0.539.0",
     "next": "15.2.2",
     "postcss": "^8.5.3",
     "react": "^19.0.0",
